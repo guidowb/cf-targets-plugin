@@ -61,7 +61,7 @@ production (current)
 #####Install from CLI
   ```
   $ cf add-plugin-repo CF-Community http://plugins.cloudfoundry.org/
-  $ cf install-plugin CLI-Recorder -r CF-Community
+  $ cf install-plugin cf-targets-plugin -r CF-Community
   ```
   
   
