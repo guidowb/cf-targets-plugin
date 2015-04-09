@@ -1,0 +1,242 @@
+package main
+
+import (
+	"os"
+	"fmt"
+	"flag"
+	"bytes"
+	"strings"
+	"io/ioutil"
+	"path/filepath"
+
+	"github.com/cloudfoundry/cli/plugin"
+	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+)
+
+type TargetsPlugin struct {
+	configPath string
+	targetsPath string
+	currentPath string
+	suffix string
+}
+
+func newTargetsPlugin() *TargetsPlugin {
+	targetsPath := filepath.Join(filepath.Dir(config_helpers.DefaultFilePath()), "targets")
+	os.Mkdir(targetsPath, 0700)
+	return &TargetsPlugin {
+		configPath: config_helpers.DefaultFilePath(),
+		targetsPath: targetsPath,
+		currentPath: filepath.Join(targetsPath, "current"),
+		suffix: "." + filepath.Base(config_helpers.DefaultFilePath()),
+	}
+}
+
+func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
+	return plugin.PluginMetadata{
+		Name: "cf-targets",
+		Version: plugin.VersionType{
+			Major: 1,
+			Minor: 0,
+			Build: 0,
+		},
+		Commands: []plugin.Command{
+			{
+				Name:     "targets",
+				HelpText: "List available targets",
+				UsageDetails: plugin.Usage {
+					Usage: "targets\n   cf targets",
+				},
+			},
+			{
+				Name:     "set-target",
+				HelpText: "Set current target",
+				UsageDetails: plugin.Usage {
+					Usage: "set-target\n   cf set-target [-f] NAME",
+					Options: map[string]string{
+						"f": "replace the current target even if it has not been saved",
+					},
+				},
+			},
+			{
+				Name:     "save-target",
+				HelpText: "Save current target",
+				UsageDetails: plugin.Usage {
+					Usage: "save-target\n   cf save-target [-f] NAME",
+					Options: map[string]string{
+						"f": "save the target even if the specified name already exists",
+					},
+				},
+			},
+			{
+				Name:     "delete-target",
+				HelpText: "Delete a saved target",
+				UsageDetails: plugin.Usage {
+					Usage: "delete-target\n   cf delete-target NAME",
+				},
+			},
+		},
+	}
+}
+
+func main() {
+	plugin.Start(newTargetsPlugin())
+}
+
+func (c *TargetsPlugin) Run(cliConnection plugin.CliConnection, args []string) {
+	if args[0] == "targets" {
+		c.TargetsCommand(args)
+	} else if args[0] == "set-target" {
+		c.SetTargetCommand(args)
+	} else if args[0] == "save-target" {
+		c.SaveTargetCommand(args)
+	} else if args[0] == "delete-target" {
+		c.DeleteTargetCommand(args)
+	}
+}
+
+func (c *TargetsPlugin) TargetsCommand(args []string) {
+	if len(args) != 1 {
+		c.exitWithUsage("targets")
+	}
+	changed := !c.currentUnchanged()
+	current := c.getCurrent()
+	targets := c.getTargets()
+	if len(targets) < 1 {
+		fmt.Println("No targets have been saved yet. To save the current target, use:")
+		fmt.Println("   cf save-target NAME")
+	} else {
+		for _,target := range targets {
+			var qualifier string
+			if target == current {
+				qualifier = "(current"
+				if changed {
+					qualifier += ", modified"
+				}
+				qualifier += ")"
+			}
+			fmt.Println(target, qualifier)
+		}
+	}
+}
+
+func (c *TargetsPlugin) SetTargetCommand(args []string) {
+	flagSet := flag.NewFlagSet("set-target", flag.ContinueOnError)
+	force := flagSet.Bool("f", false, "force")
+	err := flagSet.Parse(args[1:])
+	if err != nil || len(flagSet.Args()) != 1 {
+		c.exitWithUsage("set-target")
+	}
+	targetName := flagSet.Arg(0)
+	targetPath := c.targetPath(targetName)
+	if *force || c.currentUnchanged() {
+		c.copyContents(targetPath, c.configPath)
+		c.linkCurrent(targetPath)
+	} else {
+		fmt.Println("Your current target has not been saved. Use save-target first, or use -f to discard your changes.")
+		os.Exit(1)
+	}
+	fmt.Println("Set target to", targetName);
+}
+
+func (c *TargetsPlugin) SaveTargetCommand(args []string) {
+	flagSet := flag.NewFlagSet("save-target", flag.ContinueOnError)
+	force := flagSet.Bool("f", false, "force")
+	err := flagSet.Parse(args[1:])
+	if err != nil || len(flagSet.Args()) != 1 {
+		c.exitWithUsage("save-target")
+	}
+	targetName := flagSet.Arg(0)
+	targetPath := c.targetPath(targetName)
+	if *force || !c.targetExists(targetPath) {
+		c.copyContents(c.configPath, targetPath)
+		c.linkCurrent(targetPath)
+	} else {
+		fmt.Println("Target", targetName, "already exists. Use -f to overwrite it.")
+		os.Exit(1)
+	}
+	fmt.Println("Saved current target as", targetName)
+}
+
+func (c *TargetsPlugin) DeleteTargetCommand(args []string) {
+	if len(args) != 2 {
+		c.exitWithUsage("delete-target")
+	}
+	targetName := args[1]
+	targetPath := c.targetPath(targetName)
+	if !c.targetExists(targetPath) {
+		fmt.Println("Target", targetName, "does not exist")
+		os.Exit(1);
+	}
+	os.Remove(targetPath)
+	fmt.Println("Deleted target", targetName);
+}
+
+func (c *TargetsPlugin) getTargets() []string {
+	var targets []string
+	files,_ := ioutil.ReadDir(c.targetsPath);
+	for _,file := range files {
+		filename := file.Name()
+		if strings.HasSuffix(filename, c.suffix) {
+			targets = append(targets, strings.TrimSuffix(filename, c.suffix))
+		}
+	}
+	return targets
+}
+
+func (c *TargetsPlugin) targetExists(targetPath string) bool {
+	_, err := os.Stat(targetPath)
+	return !os.IsNotExist(err)
+}
+
+func (c *TargetsPlugin) currentUnchanged() bool {
+	currentConfig := c.configPath
+	currentTarget := c.currentPath
+	if !c.targetExists(currentTarget) {
+		return false;
+	}
+	currentContent, err := ioutil.ReadFile(currentConfig)
+	c.checkError(err)
+	savedContent, err := ioutil.ReadFile(currentTarget)
+	c.checkError(err)
+	return bytes.Equal(currentContent, savedContent)
+}
+
+func (c *TargetsPlugin) copyContents(sourcePath, targetPath string) {
+	content, err := ioutil.ReadFile(sourcePath)
+	c.checkError(err)
+	err = ioutil.WriteFile(targetPath, content, 0600)
+	c.checkError(err)
+}
+
+func (c *TargetsPlugin) linkCurrent(targetPath string) {
+	_ = os.Remove(c.currentPath)
+	err := os.Symlink(targetPath, c.currentPath)
+	c.checkError(err)
+}
+
+func (c *TargetsPlugin) targetPath(targetName string) string {
+	return filepath.Join(c.targetsPath, targetName + c.suffix)
+}
+
+func (c *TargetsPlugin) checkError(err error) {
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(1)
+	}
+}
+
+func (c *TargetsPlugin) exitWithUsage(command string) {
+	metadata := c.GetMetadata()
+	for _,candidate := range metadata.Commands {
+		if (candidate.Name == command) {
+			fmt.Println("Usage: " + candidate.UsageDetails.Usage)
+			os.Exit(1);
+		}
+	}
+}
+
+func (c *TargetsPlugin) getCurrent() string {
+	targetPath, err := filepath.EvalSymlinks(c.currentPath)
+	c.checkError(err)
+	return strings.TrimSuffix(filepath.Base(targetPath), c.suffix)
+}
