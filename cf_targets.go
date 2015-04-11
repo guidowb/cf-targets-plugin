@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 
 	"github.com/cloudfoundry/cli/plugin"
+	"github.com/cloudfoundry/cli/cf/configuration"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
 )
 
@@ -98,7 +100,7 @@ func (c *TargetsPlugin) TargetsCommand(args []string) {
 	if len(args) != 1 {
 		c.exitWithUsage("targets")
 	}
-	changed := !c.currentUnchanged()
+	changed, needsUpdate := c.compareCurrent()
 	current := c.getCurrent()
 	targets := c.getTargets()
 	if len(targets) < 1 {
@@ -111,6 +113,8 @@ func (c *TargetsPlugin) TargetsCommand(args []string) {
 				qualifier = "(current"
 				if changed {
 					qualifier += ", modified"
+				} else if needsUpdate {
+					qualifier += "*"
 				}
 				qualifier += ")"
 			}
@@ -128,7 +132,11 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 	}
 	targetName := flagSet.Arg(0)
 	targetPath := c.targetPath(targetName)
-	if *force || c.currentUnchanged() {
+	changed, needsUpdate := c.compareCurrent()
+	if *force || !changed {
+		if needsUpdate {
+			c.copyContents(c.configPath, c.currentPath)
+		}
 		c.copyContents(targetPath, c.configPath)
 		c.linkCurrent(targetPath)
 	} else {
@@ -184,21 +192,35 @@ func (c *TargetsPlugin) getTargets() []string {
 }
 
 func (c *TargetsPlugin) targetExists(targetPath string) bool {
-	_, err := os.Stat(targetPath)
-	return !os.IsNotExist(err)
+	target := configuration.NewDiskPersistor(targetPath)
+	return target.Exists()
 }
 
-func (c *TargetsPlugin) currentUnchanged() bool {
-	currentConfig := c.configPath
-	currentTarget := c.currentPath
-	if !c.targetExists(currentTarget) {
-		return false;
+func (c *TargetsPlugin) compareCurrent() (bool, bool) {
+	currentConfig := configuration.NewDiskPersistor(c.configPath)
+	currentTarget := configuration.NewDiskPersistor(c.currentPath)
+	if !currentTarget.Exists() {
+		return true, true;
 	}
-	currentContent, err := ioutil.ReadFile(currentConfig)
+
+	configData := core_config.NewData()
+	targetData := core_config.NewData()
+
+	err := currentConfig.Load(configData)
 	c.checkError(err)
-	savedContent, err := ioutil.ReadFile(currentTarget)
+	err = currentTarget.Load(targetData)
 	c.checkError(err)
-	return bytes.Equal(currentContent, savedContent)
+
+	// Ignore the access-token field, as it changes frequently
+	needsUpdate := targetData.AccessToken != configData.AccessToken
+	targetData.AccessToken = configData.AccessToken
+
+	// First check to see if the files are byte for byte identical
+	currentContent, err := configData.JsonMarshalV3()
+	c.checkError(err)
+	savedContent, err := targetData.JsonMarshalV3()
+	c.checkError(err)
+	return !bytes.Equal(currentContent, savedContent), needsUpdate
 }
 
 func (c *TargetsPlugin) copyContents(sourcePath, targetPath string) {
