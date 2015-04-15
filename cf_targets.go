@@ -215,7 +215,6 @@ func (c *TargetsPlugin) compareCurrent() (bool, bool) {
 	needsUpdate := targetData.AccessToken != configData.AccessToken
 	targetData.AccessToken = configData.AccessToken
 
-	// First check to see if the files are byte for byte identical
 	currentContent, err := configData.JsonMarshalV3()
 	c.checkError(err)
 	savedContent, err := targetData.JsonMarshalV3()
