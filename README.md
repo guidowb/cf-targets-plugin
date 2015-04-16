@@ -79,6 +79,6 @@ production (current)
 | command | usage | description|
 | :--------------- |:---------------| :------------|
 |`targets`| `cf targets` |list all saved targets|
-|`save-target`|`cf save-target [-f] <name>`|save the current target for later use|
+|`save-target`|`cf save-target [-f] [<name>]`|save the current target for later use|
 |`set-target`|`cf set-target [-f] <name>`|restore a previously saved target|
 |`delete-target`|`cf delete-target <name>`|delete a previously saved target|
