@@ -63,7 +63,7 @@ func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "save-target",
 				HelpText: "Save current target",
 				UsageDetails: plugin.Usage {
-					Usage: "save-target\n   cf save-target [-f] NAME",
+					Usage: "save-target\n   cf save-target [-f] [NAME]",
 					Options: map[string]string{
 						"f": "save the target even if the specified name already exists",
 					},
@@ -150,18 +150,43 @@ func (c *TargetsPlugin) SaveTargetCommand(args []string) {
 	flagSet := flag.NewFlagSet("save-target", flag.ContinueOnError)
 	force := flagSet.Bool("f", false, "force")
 	err := flagSet.Parse(args[1:])
-	if err != nil || len(flagSet.Args()) != 1 {
+	if err != nil || len(flagSet.Args()) > 1 {
 		c.exitWithUsage("save-target")
 	}
-	targetName := flagSet.Arg(0)
+	if len(flagSet.Args()) < 1 {
+		c.SaveCurrentTargetCommand(*force)
+	} else {
+		c.SaveNamedTargetCommand(flagSet.Arg(0), *force)
+	}
+}
+
+func (c *TargetsPlugin) SaveNamedTargetCommand(targetName string, force bool) {
 	targetPath := c.targetPath(targetName)
-	if *force || !c.targetExists(targetPath) {
+	if force || !c.targetExists(targetPath) {
 		c.copyContents(c.configPath, targetPath)
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Target", targetName, "already exists. Use -f to overwrite it.")
 		os.Exit(1)
 	}
+	fmt.Println("Saved current target as", targetName)
+}
+
+func (c *TargetsPlugin) SaveCurrentTargetCommand(force bool) {
+	currentTarget := configuration.NewDiskPersistor(c.currentPath)
+	if !currentTarget.Exists() {
+		fmt.Println("Current target has not been previously saved. Please provide a name.")
+		os.Exit(1)
+	}
+	targetName := c.getCurrent()
+	targetPath := c.targetPath(targetName)
+	changed, _ := c.compareCurrent()
+	if changed && !force {
+		fmt.Println("You've made substantial changes to the current target.")
+		fmt.Println("Use -f if you intend to overwrite the target named", targetName, "or provide an alternate name")
+		os.Exit(1)
+	}
+	c.copyContents(c.configPath, targetPath)
 	fmt.Println("Saved current target as", targetName)
 }
 
