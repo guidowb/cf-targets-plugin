@@ -101,12 +101,12 @@ func (c *TargetsPlugin) TargetsCommand(args []string) {
 		c.exitWithUsage("targets")
 	}
 	changed, needsUpdate := c.compareCurrent()
-	current := c.getCurrent()
 	targets := c.getTargets()
 	if len(targets) < 1 {
 		fmt.Println("No targets have been saved yet. To save the current target, use:")
 		fmt.Println("   cf save-target NAME")
 	} else {
+		current := c.getCurrent()
 		for _,target := range targets {
 			var qualifier string
 			if target == current {
