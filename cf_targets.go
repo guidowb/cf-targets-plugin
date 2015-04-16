@@ -20,6 +20,14 @@ type TargetsPlugin struct {
 	targetsPath string
 	currentPath string
 	suffix string
+	status TargetStatus
+}
+
+type TargetStatus struct {
+	currentHasName bool
+	currentName string
+	currentNeedsSaving bool
+	currentNeedsUpdate bool
 }
 
 func newTargetsPlugin() *TargetsPlugin {
@@ -85,6 +93,7 @@ func main() {
 }
 
 func (c *TargetsPlugin) Run(cliConnection plugin.CliConnection, args []string) {
+	c.checkStatus()
 	if args[0] == "targets" {
 		c.TargetsCommand(args)
 	} else if args[0] == "set-target" {
@@ -100,20 +109,18 @@ func (c *TargetsPlugin) TargetsCommand(args []string) {
 	if len(args) != 1 {
 		c.exitWithUsage("targets")
 	}
-	changed, needsUpdate := c.compareCurrent()
 	targets := c.getTargets()
 	if len(targets) < 1 {
 		fmt.Println("No targets have been saved yet. To save the current target, use:")
 		fmt.Println("   cf save-target NAME")
 	} else {
-		current := c.getCurrent()
 		for _,target := range targets {
 			var qualifier string
-			if target == current {
+			if c.isCurrent(target) {
 				qualifier = "(current"
-				if changed {
+				if c.status.currentNeedsSaving {
 					qualifier += ", modified"
-				} else if needsUpdate {
+				} else if c.status.currentNeedsUpdate {
 					qualifier += "*"
 				}
 				qualifier += ")"
@@ -132,9 +139,8 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 	}
 	targetName := flagSet.Arg(0)
 	targetPath := c.targetPath(targetName)
-	changed, needsUpdate := c.compareCurrent()
-	if *force || !changed {
-		if needsUpdate {
+	if *force || !c.status.currentNeedsSaving {
+		if c.status.currentHasName && c.status.currentNeedsUpdate {
 			c.copyContents(c.configPath, c.currentPath)
 		}
 		c.copyContents(targetPath, c.configPath)
@@ -173,15 +179,13 @@ func (c *TargetsPlugin) SaveNamedTargetCommand(targetName string, force bool) {
 }
 
 func (c *TargetsPlugin) SaveCurrentTargetCommand(force bool) {
-	currentTarget := configuration.NewDiskPersistor(c.currentPath)
-	if !currentTarget.Exists() {
+	if !c.status.currentHasName {
 		fmt.Println("Current target has not been previously saved. Please provide a name.")
 		os.Exit(1)
 	}
-	targetName := c.getCurrent()
+	targetName := c.status.currentName
 	targetPath := c.targetPath(targetName)
-	changed, _ := c.compareCurrent()
-	if changed && !force {
+	if c.status.currentNeedsSaving && !force {
 		fmt.Println("You've made substantial changes to the current target.")
 		fmt.Println("Use -f if you intend to overwrite the target named", targetName, "or provide an alternate name")
 		os.Exit(1)
@@ -201,6 +205,9 @@ func (c *TargetsPlugin) DeleteTargetCommand(args []string) {
 		os.Exit(1);
 	}
 	os.Remove(targetPath)
+	if c.isCurrent(targetName) {
+		os.Remove(c.currentPath)
+	}
 	fmt.Println("Deleted target", targetName);
 }
 
@@ -221,12 +228,16 @@ func (c *TargetsPlugin) targetExists(targetPath string) bool {
 	return target.Exists()
 }
 
-func (c *TargetsPlugin) compareCurrent() (bool, bool) {
+func (c *TargetsPlugin) checkStatus() {
 	currentConfig := configuration.NewDiskPersistor(c.configPath)
 	currentTarget := configuration.NewDiskPersistor(c.currentPath)
 	if !currentTarget.Exists() {
-		return true, true;
+		os.Remove(c.currentPath)
+		c.status = TargetStatus { false, "", true, false }
+		return
 	}
+
+	name := c.getCurrent()
 
 	configData := core_config.NewData()
 	targetData := core_config.NewData()
@@ -244,7 +255,7 @@ func (c *TargetsPlugin) compareCurrent() (bool, bool) {
 	c.checkError(err)
 	savedContent, err := targetData.JsonMarshalV3()
 	c.checkError(err)
-	return !bytes.Equal(currentContent, savedContent), needsUpdate
+	c.status = TargetStatus { true, name, !bytes.Equal(currentContent, savedContent), needsUpdate }
 }
 
 func (c *TargetsPlugin) copyContents(sourcePath, targetPath string) {
@@ -285,4 +296,8 @@ func (c *TargetsPlugin) getCurrent() string {
 	targetPath, err := filepath.EvalSymlinks(c.currentPath)
 	c.checkError(err)
 	return strings.TrimSuffix(filepath.Base(targetPath), c.suffix)
+}
+
+func (c *TargetsPlugin) isCurrent(target string) bool {
+	return c.status.currentHasName && c.status.currentName == target
 }
