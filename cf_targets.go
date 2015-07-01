@@ -1,31 +1,32 @@
 package main
 
 import (
-	"os"
-	"fmt"
-	"flag"
 	"bytes"
-	"strings"
+	"flag"
+	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"strings"
 
-	"github.com/cloudfoundry/cli/plugin"
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
+	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/plugin"
 )
 
 type TargetsPlugin struct {
-	configPath string
+	configPath  string
 	targetsPath string
 	currentPath string
-	suffix string
-	status TargetStatus
+	suffix      string
+	status      TargetStatus
+	exit        func(code int)
 }
 
 type TargetStatus struct {
-	currentHasName bool
-	currentName string
+	currentHasName     bool
+	currentName        string
 	currentNeedsSaving bool
 	currentNeedsUpdate bool
 }
@@ -33,11 +34,12 @@ type TargetStatus struct {
 func newTargetsPlugin() *TargetsPlugin {
 	targetsPath := filepath.Join(filepath.Dir(config_helpers.DefaultFilePath()), "targets")
 	os.Mkdir(targetsPath, 0700)
-	return &TargetsPlugin {
-		configPath: config_helpers.DefaultFilePath(),
+	return &TargetsPlugin{
+		configPath:  config_helpers.DefaultFilePath(),
 		targetsPath: targetsPath,
 		currentPath: filepath.Join(targetsPath, "current"),
-		suffix: "." + filepath.Base(config_helpers.DefaultFilePath()),
+		suffix:      "." + filepath.Base(config_helpers.DefaultFilePath()),
+		exit:        os.Exit,
 	}
 }
 
@@ -53,14 +55,14 @@ func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
 			{
 				Name:     "targets",
 				HelpText: "List available targets",
-				UsageDetails: plugin.Usage {
+				UsageDetails: plugin.Usage{
 					Usage: "cf targets",
 				},
 			},
 			{
 				Name:     "set-target",
 				HelpText: "Set current target",
-				UsageDetails: plugin.Usage {
+				UsageDetails: plugin.Usage{
 					Usage: "cf set-target [-f] NAME",
 					Options: map[string]string{
 						"f": "replace the current target even if it has not been saved",
@@ -70,7 +72,7 @@ func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
 			{
 				Name:     "save-target",
 				HelpText: "Save current target",
-				UsageDetails: plugin.Usage {
+				UsageDetails: plugin.Usage{
 					Usage: "cf save-target [-f] [NAME]",
 					Options: map[string]string{
 						"f": "save the target even if the specified name already exists",
@@ -80,7 +82,7 @@ func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
 			{
 				Name:     "delete-target",
 				HelpText: "Delete a saved target",
-				UsageDetails: plugin.Usage {
+				UsageDetails: plugin.Usage{
 					Usage: "cf delete-target NAME",
 				},
 			},
@@ -114,7 +116,7 @@ func (c *TargetsPlugin) TargetsCommand(args []string) {
 		fmt.Println("No targets have been saved yet. To save the current target, use:")
 		fmt.Println("   cf save-target NAME")
 	} else {
-		for _,target := range targets {
+		for _, target := range targets {
 			var qualifier string
 			if c.isCurrent(target) {
 				qualifier = "(current"
@@ -147,9 +149,9 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Your current target has not been saved. Use save-target first, or use -f to discard your changes.")
-		os.Exit(1)
+		c.exit(1)
 	}
-	fmt.Println("Set target to", targetName);
+	fmt.Println("Set target to", targetName)
 }
 
 func (c *TargetsPlugin) SaveTargetCommand(args []string) {
@@ -173,7 +175,7 @@ func (c *TargetsPlugin) SaveNamedTargetCommand(targetName string, force bool) {
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Target", targetName, "already exists. Use -f to overwrite it.")
-		os.Exit(1)
+		c.exit(1)
 	}
 	fmt.Println("Saved current target as", targetName)
 }
@@ -181,14 +183,14 @@ func (c *TargetsPlugin) SaveNamedTargetCommand(targetName string, force bool) {
 func (c *TargetsPlugin) SaveCurrentTargetCommand(force bool) {
 	if !c.status.currentHasName {
 		fmt.Println("Current target has not been previously saved. Please provide a name.")
-		os.Exit(1)
+		c.exit(1)
 	}
 	targetName := c.status.currentName
 	targetPath := c.targetPath(targetName)
 	if c.status.currentNeedsSaving && !force {
 		fmt.Println("You've made substantial changes to the current target.")
 		fmt.Println("Use -f if you intend to overwrite the target named", targetName, "or provide an alternate name")
-		os.Exit(1)
+		c.exit(1)
 	}
 	c.copyContents(c.configPath, targetPath)
 	fmt.Println("Saved current target as", targetName)
@@ -202,19 +204,19 @@ func (c *TargetsPlugin) DeleteTargetCommand(args []string) {
 	targetPath := c.targetPath(targetName)
 	if !c.targetExists(targetPath) {
 		fmt.Println("Target", targetName, "does not exist")
-		os.Exit(1);
+		c.exit(1)
 	}
 	os.Remove(targetPath)
 	if c.isCurrent(targetName) {
 		os.Remove(c.currentPath)
 	}
-	fmt.Println("Deleted target", targetName);
+	fmt.Println("Deleted target", targetName)
 }
 
 func (c *TargetsPlugin) getTargets() []string {
 	var targets []string
-	files,_ := ioutil.ReadDir(c.targetsPath);
-	for _,file := range files {
+	files, _ := ioutil.ReadDir(c.targetsPath)
+	for _, file := range files {
 		filename := file.Name()
 		if strings.HasSuffix(filename, c.suffix) {
 			targets = append(targets, strings.TrimSuffix(filename, c.suffix))
@@ -233,7 +235,7 @@ func (c *TargetsPlugin) checkStatus() {
 	currentTarget := configuration.NewDiskPersistor(c.currentPath)
 	if !currentTarget.Exists() {
 		os.Remove(c.currentPath)
-		c.status = TargetStatus { false, "", true, false }
+		c.status = TargetStatus{false, "", true, false}
 		return
 	}
 
@@ -255,7 +257,7 @@ func (c *TargetsPlugin) checkStatus() {
 	c.checkError(err)
 	savedContent, err := targetData.JsonMarshalV3()
 	c.checkError(err)
-	c.status = TargetStatus { true, name, !bytes.Equal(currentContent, savedContent), needsUpdate }
+	c.status = TargetStatus{true, name, !bytes.Equal(currentContent, savedContent), needsUpdate}
 }
 
 func (c *TargetsPlugin) copyContents(sourcePath, targetPath string) {
@@ -272,22 +274,22 @@ func (c *TargetsPlugin) linkCurrent(targetPath string) {
 }
 
 func (c *TargetsPlugin) targetPath(targetName string) string {
-	return filepath.Join(c.targetsPath, targetName + c.suffix)
+	return filepath.Join(c.targetsPath, targetName+c.suffix)
 }
 
 func (c *TargetsPlugin) checkError(err error) {
 	if err != nil {
 		fmt.Println("Error:", err)
-		os.Exit(1)
+		c.exit(1)
 	}
 }
 
 func (c *TargetsPlugin) exitWithUsage(command string) {
 	metadata := c.GetMetadata()
-	for _,candidate := range metadata.Commands {
-		if (candidate.Name == command) {
+	for _, candidate := range metadata.Commands {
+		if candidate.Name == command {
 			fmt.Println("Usage: " + candidate.UsageDetails.Usage)
-			os.Exit(1);
+			c.exit(1)
 		}
 	}
 }

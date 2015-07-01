@@ -1,42 +1,41 @@
-package main_test
+package main
 
 import (
 	"github.com/cloudfoundry/cli/plugin/fakes"
-	. "github.com/cloudfoundry/cli/plugin_examples/call_cli_cmd/main"
-	io_helpers "github.com/cloudfoundry/cli/testhelpers/io"
+	. "github.com/cloudfoundry/cli/testhelpers/io"
+	. "github.com/cloudfoundry/cli/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 
+var (
+	fakeExitCalled         bool
+	fakeExitCalledWithCode int
+)
+
+func fakeExit(code int) {
+	fakeExitCalled = true
+	fakeExitCalledWithCode = code
+}
+
 var _ = Describe("TargetsPlugin", func() {
-	Describe(".Run", func() {
+	Describe("Run()", func() {
 		var fakeCliConnection *fakes.FakeCliConnection
-		var TargetsPlugin *Targets
+		var targetsPlugin *TargetsPlugin
 
 		BeforeEach(func() {
 			fakeCliConnection = &fakes.FakeCliConnection{}
-			TargetsPlugin = &Targets{}
+			targetsPlugin = &TargetsPlugin{exit: fakeExit}
 		})
 
-		It("calls the cli command that is passed as the first argument", func() {
-			io_helpers.CaptureOutput(func() {
-				callCliCommandPlugin.Run(fakeCliConnection, []string{"cli-command", "plugins", "arg1"})
+		It("displays usage when targets called with too many arguments", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"targets", "blah"})
 			})
 
-			Expect(fakeCliConnection.CliCommandArgsForCall(0)[0]).To(Equal("plugins"))
-			Expect(fakeCliConnection.CliCommandArgsForCall(0)[1]).To(Equal("arg1"))
-		})
-
-		It("ouputs the text returned by the cli command", func() {
-			fakeCliConnection.CliCommandReturns([]string{"Hi", "Mom"}, nil)
-			output := io_helpers.CaptureOutput(func() {
-				callCliCommandPlugin.Run(fakeCliConnection, []string{"cli-command", "plugins", "arg1"})
-			})
-
-			Expect(output[1]).To(Equal("---------- Command output from the plugin ----------"))
-			Expect(output[2]).To(Equal("# 0  value:  Hi"))
-			Expect(output[3]).To(Equal("# 1  value:  Mom"))
-			Expect(output[4]).To(Equal("----------              FIN               -----------"))
+			Expect(fakeExitCalled).To(Equal(true))
+			Expect(fakeExitCalledWithCode).To(Equal(1))
+			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "targets"}))
 		})
 	})
 })
