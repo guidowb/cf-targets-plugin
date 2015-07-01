@@ -54,14 +54,14 @@ func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "targets",
 				HelpText: "List available targets",
 				UsageDetails: plugin.Usage {
-					Usage: "targets\n   cf targets",
+					Usage: "cf targets",
 				},
 			},
 			{
 				Name:     "set-target",
 				HelpText: "Set current target",
 				UsageDetails: plugin.Usage {
-					Usage: "set-target\n   cf set-target [-f] NAME",
+					Usage: "cf set-target [-f] NAME",
 					Options: map[string]string{
 						"f": "replace the current target even if it has not been saved",
 					},
@@ -71,7 +71,7 @@ func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "save-target",
 				HelpText: "Save current target",
 				UsageDetails: plugin.Usage {
-					Usage: "save-target\n   cf save-target [-f] [NAME]",
+					Usage: "cf save-target [-f] [NAME]",
 					Options: map[string]string{
 						"f": "save the target even if the specified name already exists",
 					},
@@ -81,7 +81,7 @@ func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
 				Name:     "delete-target",
 				HelpText: "Delete a saved target",
 				UsageDetails: plugin.Usage {
-					Usage: "delete-target\n   cf delete-target NAME",
+					Usage: "cf delete-target NAME",
 				},
 			},
 		},

@@ -1,4 +1,4 @@
-CF Targets Plugin
+CF Targets Plugin https://travis-ci.org/guidowb/cf-targets-plugin.svg?branch=master
 =================
 This plugin facilitates the use of multiple api targets with the Cloud Foundry CLI.
 
