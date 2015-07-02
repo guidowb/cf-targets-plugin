@@ -11,7 +11,7 @@ import (
 )
 
 type FakeOS struct {
-	exitCalled                 bool
+	exitCalled                 int
 	exitCalledWithCode         int
 	mkdirCalled                int
 	mkdirCalledWithPath        string
@@ -34,7 +34,7 @@ type FakeOS struct {
 }
 
 func (os *FakeOS) Exit(code int) {
-	os.exitCalled = true
+	os.exitCalled++
 	os.exitCalledWithCode = code
 }
 
@@ -77,23 +77,24 @@ func (os *FakeOS) WriteFile(path string, content []byte, mode realos.FileMode) e
 }
 
 var _ = Describe("TargetsPlugin", func() {
+
+	var fakeCliConnection *fakes.FakeCliConnection
+	var targetsPlugin *TargetsPlugin
+	var fakeOS FakeOS
+
+	BeforeEach(func() {
+		fakeOS = FakeOS{}
+		os = &fakeOS
+		fakeCliConnection = &fakes.FakeCliConnection{}
+		targetsPlugin = newTargetsPlugin()
+	})
+
 	Describe("Command Syntax", func() {
-		var fakeCliConnection *fakes.FakeCliConnection
-		var targetsPlugin *TargetsPlugin
-		var fakeOS FakeOS
-
-		BeforeEach(func() {
-			fakeOS = FakeOS{}
-			os = &fakeOS
-			fakeCliConnection = &fakes.FakeCliConnection{}
-			targetsPlugin = &TargetsPlugin{}
-		})
-
 		It("displays usage when targets called with too many arguments", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"targets", "blah"})
 			})
-			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalled).To(Equal(1))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "targets"}))
 		})
@@ -102,7 +103,7 @@ var _ = Describe("TargetsPlugin", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"set-target", "blah", "blah"})
 			})
-			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalled).To(Equal(1))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "set-target", "[-f]", "NAME"}))
 		})
@@ -111,7 +112,7 @@ var _ = Describe("TargetsPlugin", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"set-target"})
 			})
-			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalled).To(Equal(1))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "set-target", "[-f]", "NAME"}))
 		})
@@ -120,7 +121,7 @@ var _ = Describe("TargetsPlugin", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"set-target", "blah", "-k"})
 			})
-			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalled).To(Equal(1))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "set-target", "[-f]", "NAME"}))
 		})
@@ -129,7 +130,7 @@ var _ = Describe("TargetsPlugin", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"save-target", "blah", "blah"})
 			})
-			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalled).To(Equal(1))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "save-target", "[-f]", "[NAME]"}))
 		})
@@ -138,7 +139,7 @@ var _ = Describe("TargetsPlugin", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"save-target", "blah", "-k"})
 			})
-			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalled).To(Equal(1))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "save-target", "[-f]", "[NAME]"}))
 		})
@@ -147,7 +148,7 @@ var _ = Describe("TargetsPlugin", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"delete-target"})
 			})
-			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalled).To(Equal(1))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "delete-target", "NAME"}))
 		})
@@ -156,9 +157,46 @@ var _ = Describe("TargetsPlugin", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"delete-target", "blah", "blah"})
 			})
-			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalled).To(Equal(1))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "delete-target", "NAME"}))
+		})
+
+		It("displays proper first time message", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"targets"})
+			})
+			Expect(fakeOS.exitCalled).To(Equal(0))
+			Expect(output).To(ContainSubstrings([]string{"No targets have been saved"}))
+			Expect(output).To(ContainSubstrings([]string{"cf", "save-target", "NAME"}))
+		})
+	})
+
+	Describe("Configuration File Manipulation", func() {
+
+		It("creates the proper target directory", func() {
+			Expect(fakeOS.mkdirCalled).To(Equal(1))
+			Expect(fakeOS.mkdirCalledWithPath).To(HaveSuffix("/.cf/targets"))
+		})
+
+		It("properly saves first target", func() {
+			targetsPlugin.Run(fakeCliConnection, []string{"save-target", "first"})
+			Expect(fakeOS.writefileCalled).To(Equal(1))
+			Expect(fakeOS.writefileCalledWithPath).To(HaveSuffix("/.cf/targets/first.config.json"))
+			Expect(fakeOS.symlinkCalled).To(Equal(1))
+			Expect(fakeOS.symlinkCalledWithSource).To(HaveSuffix("/.cf/targets/current"))
+			Expect(fakeOS.symlinkCalledWithTarget).To(HaveSuffix("/.cf/targets/first.config.json"))
+		})
+
+		It("properly saves second target", func() {
+			targetsPlugin.Run(fakeCliConnection, []string{"save-target", "first"})
+			targetsPlugin.Run(fakeCliConnection, []string{"save-target", "second"})
+			Expect(fakeOS.writefileCalled).To(Equal(2))
+			Expect(fakeOS.writefileCalledWithPath).To(HaveSuffix("/.cf/targets/second.config.json"))
+			Expect(fakeOS.removeCalledWithPath).To(HaveSuffix("/.cf/targets/current"))
+			Expect(fakeOS.symlinkCalled).To(Equal(2))
+			Expect(fakeOS.symlinkCalledWithSource).To(HaveSuffix("/.cf/targets/current"))
+			Expect(fakeOS.symlinkCalledWithTarget).To(HaveSuffix("/.cf/targets/second.config.json"))
 		})
 	})
 })
