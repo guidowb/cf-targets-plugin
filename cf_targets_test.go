@@ -1,6 +1,8 @@
 package main
 
 import (
+	realos "os"
+
 	"github.com/cloudfoundry/cli/plugin/fakes"
 	. "github.com/cloudfoundry/cli/testhelpers/io"
 	. "github.com/cloudfoundry/cli/testhelpers/matchers"
@@ -8,33 +10,91 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var (
-	fakeExitCalled         bool
-	fakeExitCalledWithCode int
-)
+type FakeOS struct {
+	exitCalled                 bool
+	exitCalledWithCode         int
+	mkdirCalled                int
+	mkdirCalledWithPath        string
+	mkdirCalledWithMode        realos.FileMode
+	removeCalled               int
+	removeCalledWithPath       string
+	symlinkCalled              int
+	symlinkCalledWithTarget    string
+	symlinkCalledWithSource    string
+	readdirCalled              int
+	readdirCalledWithPath      string
+	readfileCalled             int
+	readfileCalledWithPath     string
+	writefileCalled            int
+	writefileCalledWithPath    string
+	writefileCalledWithContent []byte
+	writefileCalledWithMode    realos.FileMode
+	readdirShouldReturn        []realos.FileInfo
+	readfileShouldReturn       []byte
+}
 
-func fakeExit(code int) {
-	fakeExitCalled = true
-	fakeExitCalledWithCode = code
+func (os *FakeOS) Exit(code int) {
+	os.exitCalled = true
+	os.exitCalledWithCode = code
+}
+
+func (os *FakeOS) Mkdir(path string, mode realos.FileMode) {
+	os.mkdirCalled++
+	os.mkdirCalledWithPath = path
+	os.mkdirCalledWithMode = mode
+}
+
+func (os *FakeOS) Remove(path string) {
+	os.removeCalled++
+	os.removeCalledWithPath = path
+}
+
+func (os *FakeOS) Symlink(target string, source string) error {
+	os.symlinkCalled++
+	os.symlinkCalledWithTarget = target
+	os.symlinkCalledWithSource = source
+	return nil
+}
+
+func (os *FakeOS) ReadDir(path string) ([]realos.FileInfo, error) {
+	os.readdirCalled++
+	os.readdirCalledWithPath = path
+	return os.readdirShouldReturn, nil
+}
+
+func (os *FakeOS) ReadFile(path string) ([]byte, error) {
+	os.readfileCalled++
+	os.readfileCalledWithPath = path
+	return os.readfileShouldReturn, nil
+}
+
+func (os *FakeOS) WriteFile(path string, content []byte, mode realos.FileMode) error {
+	os.writefileCalled++
+	os.writefileCalledWithPath = path
+	os.writefileCalledWithContent = content
+	os.writefileCalledWithMode = mode
+	return nil
 }
 
 var _ = Describe("TargetsPlugin", func() {
 	Describe("Run()", func() {
 		var fakeCliConnection *fakes.FakeCliConnection
 		var targetsPlugin *TargetsPlugin
+		var fakeOS FakeOS
 
 		BeforeEach(func() {
+			fakeOS = FakeOS{}
+			os = &fakeOS
 			fakeCliConnection = &fakes.FakeCliConnection{}
-			targetsPlugin = &TargetsPlugin{exit: fakeExit}
+			targetsPlugin = &TargetsPlugin{}
 		})
 
 		It("displays usage when targets called with too many arguments", func() {
 			output := CaptureOutput(func() {
 				targetsPlugin.Run(fakeCliConnection, []string{"targets", "blah"})
 			})
-
-			Expect(fakeExitCalled).To(Equal(true))
-			Expect(fakeExitCalledWithCode).To(Equal(1))
+			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "targets"}))
 		})
 	})

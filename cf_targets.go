@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strings"
+
+	realio "io/ioutil"
+	realos "os"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
 	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
@@ -21,7 +22,6 @@ type TargetsPlugin struct {
 	currentPath string
 	suffix      string
 	status      TargetStatus
-	exit        func(code int)
 }
 
 type TargetStatus struct {
@@ -31,6 +31,29 @@ type TargetStatus struct {
 	currentNeedsUpdate bool
 }
 
+type RealOS struct{}
+type OS interface {
+	Exit(int)
+	Mkdir(string, realos.FileMode)
+	Remove(string)
+	Symlink(string, string) error
+	ReadDir(string) ([]realos.FileInfo, error)
+	ReadFile(string) ([]byte, error)
+	WriteFile(string, []byte, realos.FileMode) error
+}
+
+func (*RealOS) Exit(code int)                                  { realos.Exit(code) }
+func (*RealOS) Mkdir(path string, mode realos.FileMode)        { realos.Mkdir(path, mode) }
+func (*RealOS) Remove(path string)                             { realos.Remove(path) }
+func (*RealOS) Symlink(target string, source string) error     { return realos.Symlink(target, source) }
+func (*RealOS) ReadDir(path string) ([]realos.FileInfo, error) { return realio.ReadDir(path) }
+func (*RealOS) ReadFile(path string) ([]byte, error)           { return realio.ReadFile(path) }
+func (*RealOS) WriteFile(path string, content []byte, mode realos.FileMode) error {
+	return realio.WriteFile(path, content, mode)
+}
+
+var os OS
+
 func newTargetsPlugin() *TargetsPlugin {
 	targetsPath := filepath.Join(filepath.Dir(config_helpers.DefaultFilePath()), "targets")
 	os.Mkdir(targetsPath, 0700)
@@ -39,7 +62,6 @@ func newTargetsPlugin() *TargetsPlugin {
 		targetsPath: targetsPath,
 		currentPath: filepath.Join(targetsPath, "current"),
 		suffix:      "." + filepath.Base(config_helpers.DefaultFilePath()),
-		exit:        os.Exit,
 	}
 }
 
@@ -91,6 +113,7 @@ func (c *TargetsPlugin) GetMetadata() plugin.PluginMetadata {
 }
 
 func main() {
+	os = &RealOS{}
 	plugin.Start(newTargetsPlugin())
 }
 
@@ -149,7 +172,7 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Your current target has not been saved. Use save-target first, or use -f to discard your changes.")
-		c.exit(1)
+		os.Exit(1)
 	}
 	fmt.Println("Set target to", targetName)
 }
@@ -175,7 +198,7 @@ func (c *TargetsPlugin) SaveNamedTargetCommand(targetName string, force bool) {
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Target", targetName, "already exists. Use -f to overwrite it.")
-		c.exit(1)
+		os.Exit(1)
 	}
 	fmt.Println("Saved current target as", targetName)
 }
@@ -183,14 +206,14 @@ func (c *TargetsPlugin) SaveNamedTargetCommand(targetName string, force bool) {
 func (c *TargetsPlugin) SaveCurrentTargetCommand(force bool) {
 	if !c.status.currentHasName {
 		fmt.Println("Current target has not been previously saved. Please provide a name.")
-		c.exit(1)
+		os.Exit(1)
 	}
 	targetName := c.status.currentName
 	targetPath := c.targetPath(targetName)
 	if c.status.currentNeedsSaving && !force {
 		fmt.Println("You've made substantial changes to the current target.")
 		fmt.Println("Use -f if you intend to overwrite the target named", targetName, "or provide an alternate name")
-		c.exit(1)
+		os.Exit(1)
 	}
 	c.copyContents(c.configPath, targetPath)
 	fmt.Println("Saved current target as", targetName)
@@ -204,7 +227,7 @@ func (c *TargetsPlugin) DeleteTargetCommand(args []string) {
 	targetPath := c.targetPath(targetName)
 	if !c.targetExists(targetPath) {
 		fmt.Println("Target", targetName, "does not exist")
-		c.exit(1)
+		os.Exit(1)
 	}
 	os.Remove(targetPath)
 	if c.isCurrent(targetName) {
@@ -215,7 +238,7 @@ func (c *TargetsPlugin) DeleteTargetCommand(args []string) {
 
 func (c *TargetsPlugin) getTargets() []string {
 	var targets []string
-	files, _ := ioutil.ReadDir(c.targetsPath)
+	files, _ := os.ReadDir(c.targetsPath)
 	for _, file := range files {
 		filename := file.Name()
 		if strings.HasSuffix(filename, c.suffix) {
@@ -261,14 +284,14 @@ func (c *TargetsPlugin) checkStatus() {
 }
 
 func (c *TargetsPlugin) copyContents(sourcePath, targetPath string) {
-	content, err := ioutil.ReadFile(sourcePath)
+	content, err := os.ReadFile(sourcePath)
 	c.checkError(err)
-	err = ioutil.WriteFile(targetPath, content, 0600)
+	err = os.WriteFile(targetPath, content, 0600)
 	c.checkError(err)
 }
 
 func (c *TargetsPlugin) linkCurrent(targetPath string) {
-	_ = os.Remove(c.currentPath)
+	os.Remove(c.currentPath)
 	err := os.Symlink(targetPath, c.currentPath)
 	c.checkError(err)
 }
@@ -280,7 +303,7 @@ func (c *TargetsPlugin) targetPath(targetName string) string {
 func (c *TargetsPlugin) checkError(err error) {
 	if err != nil {
 		fmt.Println("Error:", err)
-		c.exit(1)
+		os.Exit(1)
 	}
 }
 
@@ -289,7 +312,7 @@ func (c *TargetsPlugin) exitWithUsage(command string) {
 	for _, candidate := range metadata.Commands {
 		if candidate.Name == command {
 			fmt.Println("Usage: " + candidate.UsageDetails.Usage)
-			c.exit(1)
+			os.Exit(1)
 		}
 	}
 }
