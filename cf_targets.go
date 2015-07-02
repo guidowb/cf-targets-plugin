@@ -118,6 +118,15 @@ func main() {
 }
 
 func (c *TargetsPlugin) Run(cliConnection plugin.CliConnection, args []string) {
+	defer func() {
+		reason := recover()
+		if code, ok := reason.(int); ok {
+			os.Exit(code)
+		} else if reason != nil {
+			panic(reason)
+		}
+	}()
+
 	c.checkStatus()
 	if args[0] == "targets" {
 		c.TargetsCommand(args)
@@ -172,7 +181,7 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Your current target has not been saved. Use save-target first, or use -f to discard your changes.")
-		os.Exit(1)
+		panic(1)
 	}
 	fmt.Println("Set target to", targetName)
 }
@@ -198,7 +207,7 @@ func (c *TargetsPlugin) SaveNamedTargetCommand(targetName string, force bool) {
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Target", targetName, "already exists. Use -f to overwrite it.")
-		os.Exit(1)
+		panic(1)
 	}
 	fmt.Println("Saved current target as", targetName)
 }
@@ -206,14 +215,14 @@ func (c *TargetsPlugin) SaveNamedTargetCommand(targetName string, force bool) {
 func (c *TargetsPlugin) SaveCurrentTargetCommand(force bool) {
 	if !c.status.currentHasName {
 		fmt.Println("Current target has not been previously saved. Please provide a name.")
-		os.Exit(1)
+		panic(1)
 	}
 	targetName := c.status.currentName
 	targetPath := c.targetPath(targetName)
 	if c.status.currentNeedsSaving && !force {
 		fmt.Println("You've made substantial changes to the current target.")
 		fmt.Println("Use -f if you intend to overwrite the target named", targetName, "or provide an alternate name")
-		os.Exit(1)
+		panic(1)
 	}
 	c.copyContents(c.configPath, targetPath)
 	fmt.Println("Saved current target as", targetName)
@@ -227,7 +236,7 @@ func (c *TargetsPlugin) DeleteTargetCommand(args []string) {
 	targetPath := c.targetPath(targetName)
 	if !c.targetExists(targetPath) {
 		fmt.Println("Target", targetName, "does not exist")
-		os.Exit(1)
+		panic(1)
 	}
 	os.Remove(targetPath)
 	if c.isCurrent(targetName) {
@@ -303,7 +312,7 @@ func (c *TargetsPlugin) targetPath(targetName string) string {
 func (c *TargetsPlugin) checkError(err error) {
 	if err != nil {
 		fmt.Println("Error:", err)
-		os.Exit(1)
+		panic(1)
 	}
 }
 
@@ -312,7 +321,7 @@ func (c *TargetsPlugin) exitWithUsage(command string) {
 	for _, candidate := range metadata.Commands {
 		if candidate.Name == command {
 			fmt.Println("Usage: " + candidate.UsageDetails.Usage)
-			os.Exit(1)
+			panic(1)
 		}
 	}
 }

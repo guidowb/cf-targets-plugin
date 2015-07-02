@@ -77,7 +77,7 @@ func (os *FakeOS) WriteFile(path string, content []byte, mode realos.FileMode) e
 }
 
 var _ = Describe("TargetsPlugin", func() {
-	Describe("Run()", func() {
+	Describe("Command Syntax", func() {
 		var fakeCliConnection *fakes.FakeCliConnection
 		var targetsPlugin *TargetsPlugin
 		var fakeOS FakeOS
@@ -96,6 +96,69 @@ var _ = Describe("TargetsPlugin", func() {
 			Expect(fakeOS.exitCalled).To(Equal(true))
 			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
 			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "targets"}))
+		})
+
+		It("displays usage when set-target called with too many arguments", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"set-target", "blah", "blah"})
+			})
+			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
+			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "set-target", "[-f]", "NAME"}))
+		})
+
+		It("displays usage when set-target called with too few arguments", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"set-target"})
+			})
+			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
+			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "set-target", "[-f]", "NAME"}))
+		})
+
+		It("displays usage when set-target called with unsupported option", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"set-target", "blah", "-k"})
+			})
+			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
+			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "set-target", "[-f]", "NAME"}))
+		})
+
+		It("displays usage when save-target called with too many arguments", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"save-target", "blah", "blah"})
+			})
+			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
+			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "save-target", "[-f]", "[NAME]"}))
+		})
+
+		It("displays usage when save-target called with unsupported option", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"save-target", "blah", "-k"})
+			})
+			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
+			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "save-target", "[-f]", "[NAME]"}))
+		})
+
+		It("displays usage when delete-target called with too few arguments", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"delete-target"})
+			})
+			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
+			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "delete-target", "NAME"}))
+		})
+
+		It("displays usage when delete-target called with too many arguments", func() {
+			output := CaptureOutput(func() {
+				targetsPlugin.Run(fakeCliConnection, []string{"delete-target", "blah", "blah"})
+			})
+			Expect(fakeOS.exitCalled).To(Equal(true))
+			Expect(fakeOS.exitCalledWithCode).To(Equal(1))
+			Expect(output).To(ContainSubstrings([]string{"Usage:", "cf", "delete-target", "NAME"}))
 		})
 	})
 })
