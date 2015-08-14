@@ -173,6 +173,10 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 	}
 	targetName := flagSet.Arg(0)
 	targetPath := c.targetPath(targetName)
+	if (!c.targetExists(targetPath)) {
+		fmt.Println("Target", targetName, "does not exist.")
+		panic(1)
+	}
 	if *force || !c.status.currentNeedsSaving {
 		c.copyContents(targetPath, c.configPath)
 		c.linkCurrent(targetPath)
