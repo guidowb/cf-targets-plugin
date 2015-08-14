@@ -181,6 +181,7 @@ var _ = Describe("TargetsPlugin", func() {
 
 		It("properly saves first target", func() {
 			targetsPlugin.Run(fakeCliConnection, []string{"save-target", "first"})
+			Expect(fakeOS.exitCalled).To(Equal(0))
 			Expect(fakeOS.writefileCalled).To(Equal(1))
 			Expect(fakeOS.writefileCalledWithPath).To(HaveSuffix("/.cf/targets/first.config.json"))
 			Expect(fakeOS.symlinkCalled).To(Equal(1))
@@ -191,6 +192,7 @@ var _ = Describe("TargetsPlugin", func() {
 		It("properly saves second target", func() {
 			targetsPlugin.Run(fakeCliConnection, []string{"save-target", "first"})
 			targetsPlugin.Run(fakeCliConnection, []string{"save-target", "second"})
+			Expect(fakeOS.exitCalled).To(Equal(0))
 			Expect(fakeOS.writefileCalled).To(Equal(2))
 			Expect(fakeOS.writefileCalledWithPath).To(HaveSuffix("/.cf/targets/second.config.json"))
 			Expect(fakeOS.removeCalledWithPath).To(HaveSuffix("/.cf/targets/current"))
