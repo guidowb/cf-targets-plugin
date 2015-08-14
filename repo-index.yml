@@ -1,8 +1,8 @@
 - name: Targets
   description: Easily manage multiple CF targets
-  version: 1.0.0
+  version: _TAG_
   created: 2015-4-17
-  updated: 2015-4-17
+  updated: 2015-8-14
   company:
   authors:
   - name: Guido Westenberg
@@ -11,11 +11,11 @@
   homepage: http://github.com/guidowb/cf-targets-plugin
   binaries:
   - platform: osx
-    url: http://github.com/guidowb/cf-targets-plugin/raw/master/bin/osx/cf-targets-plugin
+    url: http://github.com/guidowb/cf-targets-plugin/raw/_TAG_/bin/osx/cf-targets-plugin
     checksum: osx-sha1
   - platform: win64
-    url: http://github.com/guidowb/cf-targets-plugin/raw/master/bin/win64/cf-targets-plugin.exe
+    url: http://github.com/guidowb/cf-targets-plugin/raw/_TAG_/bin/win64/cf-targets-plugin.exe
     checksum: win64-sha1
   - platform: linux64
-    url: http://github.com/guidowb/cf-targets-plugin/raw/master/bin/linux64/cf-targets-plugin
+    url: http://github.com/guidowb/cf-targets-plugin/raw/_TAG_/bin/linux64/cf-targets-plugin
     checksum: linux64-sha1
