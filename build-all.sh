@@ -15,7 +15,7 @@ if [[ "$1" = "release" ]] ; then
 
 		`sed -i .bak -e "s/Major:.*/Major: $MAJOR,/" \
 			-e "s/Minor:.*/Minor: $MINOR,/" \
-			-e "s/Build:.*/Build: $BUILD,/" usagereport.go`
+			-e "s/Build:.*/Build: $BUILD,/" cf_targets.go`
 	fi
 fi
 
