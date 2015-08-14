@@ -174,9 +174,6 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 	targetName := flagSet.Arg(0)
 	targetPath := c.targetPath(targetName)
 	if *force || !c.status.currentNeedsSaving {
-		if c.status.currentHasName && c.status.currentNeedsUpdate {
-			c.copyContents(c.configPath, c.currentPath)
-		}
 		c.copyContents(targetPath, c.configPath)
 		c.linkCurrent(targetPath)
 	} else {
