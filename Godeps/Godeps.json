@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/guidowb/cf-targets-plugin",
+	"ImportPath": "github.com/loafoe/cf-targets-plugin",
 	"GoVersion": "go1.7",
 	"GodepVersion": "v74",
 	"Packages": [
@@ -7,7 +7,187 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/actors",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/actors/brokerbuilder",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/actors/planbuilder",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/actors/pluginrepo",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/actors/servicebuilder",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/appevents",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/appfiles",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/appinstances",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/applicationbits",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/applications",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/authentication",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/copyapplicationsource",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/environmentvariablegroups",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/featureflags",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/logs",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/organizations",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/password",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/quotas",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/resources",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/securitygroups",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/securitygroups/defaults",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/securitygroups/defaults/running",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/securitygroups/defaults/staging",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/securitygroups/spaces",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/spacequotas",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/spaces",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/api/stacks",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/appfiles",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/commandregistry",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
 			"ImportPath": "code.cloudfoundry.org/cli/cf/configuration",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/configuration/confighelpers",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/configuration/coreconfig",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/configuration/pluginconfig",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/errors",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/flags",
 			"Comment": "v6.23.1-77-g489fb50",
 			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
 		},
@@ -22,7 +202,22 @@
 			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
 		},
 		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/manifest",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
 			"ImportPath": "code.cloudfoundry.org/cli/cf/models",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/net",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/requirements",
 			"Comment": "v6.23.1-77-g489fb50",
 			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
 		},
@@ -32,7 +227,82 @@
 			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
 		},
 		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/terminal",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/trace",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/v3/models",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/cf/v3/repository",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/plugin",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
 			"ImportPath": "code.cloudfoundry.org/cli/plugin/models",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/configv3",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/generic",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/glob",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/sorting",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/testhelpers/commands",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/testhelpers/net",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/testhelpers/terminal",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/words",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "code.cloudfoundry.org/cli/util/words/generator",
 			"Comment": "v6.23.1-77-g489fb50",
 			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
 		},
@@ -42,9 +312,41 @@
 			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
 		},
 		{
+			"ImportPath": "code.cloudfoundry.org/gofileutils/fileutils",
+			"Rev": "4d0c80011a0f37da1711c184028bc40137cd45af"
+		},
+		{
+			"ImportPath": "github.com/SermoDigital/jose",
+			"Comment": "1.1-1-g2bd9b81",
+			"Rev": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9"
+		},
+		{
+			"ImportPath": "github.com/SermoDigital/jose/crypto",
+			"Comment": "1.1-1-g2bd9b81",
+			"Rev": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9"
+		},
+		{
+			"ImportPath": "github.com/SermoDigital/jose/jws",
+			"Comment": "1.1-1-g2bd9b81",
+			"Rev": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9"
+		},
+		{
+			"ImportPath": "github.com/SermoDigital/jose/jwt",
+			"Comment": "1.1-1-g2bd9b81",
+			"Rev": "2bd9b81ac51d6d6134fcd4fd846bd2e7347a15f9"
+		},
+		{
 			"ImportPath": "github.com/blang/semver",
 			"Comment": "v3.1.0",
 			"Rev": "aea32c919a18e5ef4537bbd283ff29594b1b0165"
+		},
+		{
+			"ImportPath": "github.com/bmizerany/pat",
+			"Rev": "c068ca2f0aacee5ac3681d68e4d0a003b7d1fd2c"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry-incubator/cli-plugin-repo/web",
+			"Rev": "62545a44009bc8edb02ef5b2b5c939488960b2c9"
 		},
 		{
 			"ImportPath": "github.com/cloudfoundry/cli/cf/configuration",
@@ -65,6 +367,90 @@
 			"ImportPath": "github.com/cloudfoundry/cli/plugin",
 			"Comment": "v6.23.1-77-g489fb50",
 			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/cli/plugin/pluginfakes",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/cli/util/testhelpers/io",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/cli/util/testhelpers/matchers",
+			"Comment": "v6.23.1-77-g489fb50",
+			"Rev": "489fb5030c24b678a6232cc730d328cd7b2d98e9"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/go-ccapi/v3/client",
+			"Rev": "71998966d470aeafdb4acabf79a75e444d6f78f6"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/go-ccapi/v3/routing",
+			"Rev": "71998966d470aeafdb4acabf79a75e444d6f78f6"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa",
+			"Comment": "v2.0.0-5-g9e08723",
+			"Rev": "9e087230f2fedf46641976e14cbc41fe6a2bbec8"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa/consumer",
+			"Comment": "v2.0.0-5-g9e08723",
+			"Rev": "9e087230f2fedf46641976e14cbc41fe6a2bbec8"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa/consumer/internal",
+			"Comment": "v2.0.0-5-g9e08723",
+			"Rev": "9e087230f2fedf46641976e14cbc41fe6a2bbec8"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/noaa/errors",
+			"Comment": "v2.0.0-5-g9e08723",
+			"Rev": "9e087230f2fedf46641976e14cbc41fe6a2bbec8"
+		},
+		{
+			"ImportPath": "github.com/cloudfoundry/sonde-go/events",
+			"Rev": "78019103037ae46207993c8816e970d85bf1a9e4"
+		},
+		{
+			"ImportPath": "github.com/fatih/color",
+			"Comment": "v0.1-8-g76d4231",
+			"Rev": "76d423163af754ff6423d2d9be0057fbf03c57c2"
+		},
+		{
+			"ImportPath": "github.com/gogo/protobuf/gogoproto",
+			"Comment": "v0.3-145-gfb8a359",
+			"Rev": "fb8a359905af6e2b6517cccda0ba25915322ee88"
+		},
+		{
+			"ImportPath": "github.com/gogo/protobuf/proto",
+			"Comment": "v0.3-145-gfb8a359",
+			"Rev": "fb8a359905af6e2b6517cccda0ba25915322ee88"
+		},
+		{
+			"ImportPath": "github.com/gogo/protobuf/protoc-gen-gogo/descriptor",
+			"Comment": "v0.3-145-gfb8a359",
+			"Rev": "fb8a359905af6e2b6517cccda0ba25915322ee88"
+		},
+		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "53e6ce116135b80d037921a7fdd5138cf32d7a8a"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Rev": "3986be78bf859e01f01af631ad76da5b269d270c"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-colorable",
+			"Comment": "v0.0.6-9-gd228849",
+			"Rev": "d228849504861217f796da67fae4f6e347643f15"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-isatty",
+			"Rev": "7fcbc72f853b92b5720db4a6b8482be612daef24"
 		},
 		{
 			"ImportPath": "github.com/nicksnyder/go-i18n/i18n",
@@ -88,78 +474,88 @@
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/config",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/codelocation",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/containernode",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/failer",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/leafnodes",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/remote",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/spec",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/specrunner",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/suite",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/testingtproxy",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/internal/writer",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/reporters",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/reporters/stenographer",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
+		},
+		{
+			"ImportPath": "github.com/onsi/ginkgo/reporters/stenographer/support/go-colorable",
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
+		},
+		{
+			"ImportPath": "github.com/onsi/ginkgo/reporters/stenographer/support/go-isatty",
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo/types",
-			"Comment": "v1.2.0-58-g16c3879",
-			"Rev": "16c38793d41b07a5f9ae77d573af7836a994bf27"
+			"Comment": "v1.2.0-90-gbb93381",
+			"Rev": "bb93381d543b0e5725244abe752214a110791d01"
 		},
 		{
 			"ImportPath": "github.com/onsi/gomega",
@@ -220,6 +616,19 @@
 			"ImportPath": "github.com/onsi/gomega/types",
 			"Comment": "v1.0-109-g82a02ec",
 			"Rev": "82a02eccf12c018071eef42fbb701c0db6f1e3db"
+		},
+		{
+			"ImportPath": "github.com/tedsuo/rata",
+			"Comment": "v1.0.0",
+			"Rev": "0649c23705dfb45a9693b668c4fc1c0666f485d9"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ssh/terminal",
+			"Rev": "854ae91cdcbf914b499b1d7641d07859f3653481"
+		},
+		{
+			"ImportPath": "golang.org/x/net/websocket",
+			"Rev": "cd8c2701a5e10f044db915e65eac68f738399d22"
 		},
 		{
 			"ImportPath": "golang.org/x/sys/unix",
