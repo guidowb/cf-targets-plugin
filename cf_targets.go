@@ -11,8 +11,8 @@ import (
 	realos "os"
 
 	"github.com/cloudfoundry/cli/cf/configuration"
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/plugin"
 )
 
@@ -55,13 +55,14 @@ func (*RealOS) WriteFile(path string, content []byte, mode realos.FileMode) erro
 var os OS
 
 func newTargetsPlugin() *TargetsPlugin {
-	targetsPath := filepath.Join(filepath.Dir(config_helpers.DefaultFilePath()), "targets")
+	configPath, _ := confighelpers.DefaultFilePath()
+	targetsPath := filepath.Join(filepath.Dir(configPath), "targets")
 	os.Mkdir(targetsPath, 0700)
 	return &TargetsPlugin{
-		configPath:  config_helpers.DefaultFilePath(),
+		configPath:  configPath,
 		targetsPath: targetsPath,
 		currentPath: filepath.Join(targetsPath, "current"),
-		suffix:      "." + filepath.Base(config_helpers.DefaultFilePath()),
+		suffix:      "." + filepath.Base(configPath),
 	}
 }
 
@@ -173,7 +174,7 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 	}
 	targetName := flagSet.Arg(0)
 	targetPath := c.targetPath(targetName)
-	if (!c.targetExists(targetPath)) {
+	if !c.targetExists(targetPath) {
 		fmt.Println("Target", targetName, "does not exist.")
 		panic(1)
 	}
@@ -274,8 +275,8 @@ func (c *TargetsPlugin) checkStatus() {
 
 	name := c.getCurrent()
 
-	configData := core_config.NewData()
-	targetData := core_config.NewData()
+	configData := coreconfig.NewData()
+	targetData := coreconfig.NewData()
 
 	err := currentConfig.Load(configData)
 	c.checkError(err)
@@ -286,9 +287,9 @@ func (c *TargetsPlugin) checkStatus() {
 	needsUpdate := targetData.AccessToken != configData.AccessToken
 	targetData.AccessToken = configData.AccessToken
 
-	currentContent, err := configData.JsonMarshalV3()
+	currentContent, err := configData.JSONMarshalV3()
 	c.checkError(err)
-	savedContent, err := targetData.JsonMarshalV3()
+	savedContent, err := targetData.JSONMarshalV3()
 	c.checkError(err)
 	c.status = TargetStatus{true, name, !bytes.Equal(currentContent, savedContent), needsUpdate}
 }

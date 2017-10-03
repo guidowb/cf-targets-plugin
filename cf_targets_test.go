@@ -3,9 +3,9 @@ package main
 import (
 	realos "os"
 
-	"github.com/cloudfoundry/cli/plugin/fakes"
-	. "github.com/cloudfoundry/cli/testhelpers/io"
-	. "github.com/cloudfoundry/cli/testhelpers/matchers"
+	fakes "github.com/cloudfoundry/cli/plugin/pluginfakes"
+	. "github.com/cloudfoundry/cli/util/testhelpers/io"
+	. "github.com/cloudfoundry/cli/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
