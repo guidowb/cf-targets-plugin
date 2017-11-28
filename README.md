@@ -63,8 +63,8 @@ production (current)
 ##Installation
 #####Install from CLI
   ```
-  $ cf add-plugin-repo CF-Community http://plugins.cloudfoundry.org/
-  $ cf install-plugin targets -r CF-Community
+  $ cf add-plugin-repo CF-Community https://plugins.cloudfoundry.org/
+  $ cf install-plugin Targets -r CF-Community
   ```
   
   
