@@ -14,6 +14,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
 	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/plugin"
+	"github.com/pmezard/go-difflib/difflib"
 )
 
 type TargetsPlugin struct {
@@ -183,6 +184,17 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Your current target has not been saved. Use save-target first, or use -f to discard your changes.")
+		currentContent, _ := os.ReadFile(c.currentPath)
+		targetContent, _ := os.ReadFile(targetPath)
+		diff := difflib.UnifiedDiff{
+			A:        difflib.SplitLines(string(currentContent[:])),
+			B:        difflib.SplitLines(string(targetContent[:])),
+			FromFile: "Current",
+			ToFile:   "Target",
+			Context:  3,
+		}
+		text, _ := difflib.GetUnifiedDiffString(diff)
+		fmt.Println(text)
 		panic(1)
 	}
 	fmt.Println("Set target to", targetName)
