@@ -18,7 +18,7 @@ This plugin makes switching a lot less painful by allowing you to save your curr
 configured target using a name, then switching back to it by name at any point.
 
 
-##Usage
+## Usage
 
 Configure and save any number of named targets
 
@@ -60,15 +60,15 @@ production (current)
 ```
 
 
-##Installation
-#####Install from CLI
+## Installation
+##### Install from CLI
   ```
   $ cf add-plugin-repo CF-Community https://plugins.cloudfoundry.org/
   $ cf install-plugin Targets -r CF-Community
   ```
   
   
-#####Install from Source (need to have [Go](http://golang.org/dl/) installed)
+##### Install from Source (need to have [Go](http://golang.org/dl/) installed)
   ```
   $ go get github.com/cloudfoundry/cli
   $ go get github.com/guidowb/cf-targets-plugin
@@ -77,7 +77,7 @@ production (current)
   $ cf install-plugin cf-targets-plugin
   ```
 
-##Full Command List
+## Full Command List
 
 | command | usage | description|
 | :--------------- |:---------------| :------------|
