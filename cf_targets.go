@@ -260,8 +260,7 @@ func (c *TargetsPlugin) SaveCurrentTargetCommand(force bool) {
 	if c.status.currentNeedsSaving && !force {
 		fmt.Println("You've made substantial changes to the current target.")
 		fmt.Println("Use -f if you intend to overwrite the target named", targetName, "or provide an alternate name")
-		// XXX: dma This is not working atm. Need to diff against
-		showDiff(c, targetPath)
+		showDiff(c, c.configPath)
 		panic(1)
 	}
 	c.copyContents(c.configPath, targetPath)
