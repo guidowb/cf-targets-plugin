@@ -168,20 +168,13 @@ func (c *TargetsPlugin) TargetsCommand(args []string) {
 }
 
 func showDiff(c *TargetsPlugin, targetPath string) {
-	// TODO
-	// - read config file on disk
-	// - parse json contents
-	// - remove from parsed data accesstoken and refreshtoken
-	// - diff both
-	// - show diff
-	// - profit?
 	var json_data_current map[string]interface{}
 	var json_data_target map[string]interface{}
 	currentContent, _ := os.ReadFile(c.currentPath)
 	targetContent, _ := os.ReadFile(targetPath)
 	json.Unmarshal(currentContent, &json_data_current)
 	json.Unmarshal(targetContent, &json_data_target)
-
+	// Remove things that change often and make the diff output unreadable.
 	delete(json_data_current, "AccessToken")
 	delete(json_data_current, "RefreshToken")
 	delete(json_data_target, "AccessToken")
