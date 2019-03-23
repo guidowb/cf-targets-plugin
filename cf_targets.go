@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"path/filepath"
@@ -166,6 +167,39 @@ func (c *TargetsPlugin) TargetsCommand(args []string) {
 	}
 }
 
+func showDiff(c *TargetsPlugin, targetPath string) {
+	// TODO
+	// - read config file on disk
+	// - parse json contents
+	// - remove from parsed data accesstoken and refreshtoken
+	// - diff both
+	// - show diff
+	// - profit?
+	var json_data_current map[string]interface{}
+	var json_data_target map[string]interface{}
+	currentContent, _ := os.ReadFile(c.currentPath)
+	targetContent, _ := os.ReadFile(targetPath)
+	json.Unmarshal(currentContent, &json_data_current)
+	json.Unmarshal(targetContent, &json_data_target)
+
+	delete(json_data_current, "AccessToken")
+	delete(json_data_current, "RefreshToken")
+	delete(json_data_target, "AccessToken")
+	delete(json_data_target, "RefreshToken")
+	updated_content_current, _ := json.MarshalIndent(json_data_current, "", " ")
+	updated_content_target, _ := json.MarshalIndent(json_data_target, "", " ")
+
+	diff := difflib.UnifiedDiff{
+		A:        difflib.SplitLines(string(updated_content_current[:])),
+		B:        difflib.SplitLines(string(updated_content_target[:])),
+		FromFile: "Current",
+		ToFile:   "Target",
+		Context:  2,
+	}
+	text, _ := difflib.GetUnifiedDiffString(diff)
+	fmt.Println(text)
+}
+
 func (c *TargetsPlugin) SetTargetCommand(args []string) {
 	flagSet := flag.NewFlagSet("set-target", flag.ContinueOnError)
 	force := flagSet.Bool("f", false, "force")
@@ -184,17 +218,7 @@ func (c *TargetsPlugin) SetTargetCommand(args []string) {
 		c.linkCurrent(targetPath)
 	} else {
 		fmt.Println("Your current target has not been saved. Use save-target first, or use -f to discard your changes.")
-		currentContent, _ := os.ReadFile(c.currentPath)
-		targetContent, _ := os.ReadFile(targetPath)
-		diff := difflib.UnifiedDiff{
-			A:        difflib.SplitLines(string(currentContent[:])),
-			B:        difflib.SplitLines(string(targetContent[:])),
-			FromFile: "Current",
-			ToFile:   "Target",
-			Context:  3,
-		}
-		text, _ := difflib.GetUnifiedDiffString(diff)
-		fmt.Println(text)
+		showDiff(c, targetPath)
 		panic(1)
 	}
 	fmt.Println("Set target to", targetName)
@@ -236,6 +260,8 @@ func (c *TargetsPlugin) SaveCurrentTargetCommand(force bool) {
 	if c.status.currentNeedsSaving && !force {
 		fmt.Println("You've made substantial changes to the current target.")
 		fmt.Println("Use -f if you intend to overwrite the target named", targetName, "or provide an alternate name")
+		// XXX: dma This is not working atm. Need to diff against
+		showDiff(c, targetPath)
 		panic(1)
 	}
 	c.copyContents(c.configPath, targetPath)
