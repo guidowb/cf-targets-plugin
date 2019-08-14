@@ -15,10 +15,12 @@ require (
 	github.com/cloudfoundry/bosh-cli v6.0.0+incompatible // indirect
 	github.com/cloudfoundry/bosh-utils v0.0.0-20190813211102-4d0b7c5acdfd // indirect
 	github.com/cloudfoundry/cli v6.46.0+incompatible
+	github.com/cloudfoundry/cli-plugin-repo v0.0.0-20190808155747-f1af6115b6ff // indirect
 	github.com/cloudfoundry/go-ccapi v0.0.0-20170111115350-71998966d470
 	github.com/cloudfoundry/noaa v0.0.0-20170131060151-9e087230f2fe
 	github.com/cloudfoundry/sonde-go v0.0.0-20170118225207-78019103037a
 	github.com/cppforlife/go-patch v0.2.0 // indirect
+	github.com/cyphar/filepath-securejoin v0.2.2 // indirect
 	github.com/fatih/color v0.0.0-20150823214434-76d423163af7
 	github.com/gogo/protobuf v0.0.0-20170125171659-fb8a359905af
 	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
@@ -30,6 +32,7 @@ require (
 	github.com/nicksnyder/go-i18n v0.0.0-20170120160056-64786dc4f56b
 	github.com/onsi/ginkgo v0.0.0-20170126062008-bb93381d543b
 	github.com/onsi/gomega v0.0.0-20160705151310-82a02eccf12c
+	github.com/pkg/errors v0.8.1 // indirect
 	github.com/shiena/ansicolor v0.0.0-20151119151921-a422bbe96644 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	github.com/tedsuo/rata v1.0.0

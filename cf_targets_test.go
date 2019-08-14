@@ -4,8 +4,8 @@ import (
 	realos "os"
 
 	fakes "github.com/cloudfoundry/cli/plugin/pluginfakes"
-	. "github.com/cloudfoundry/cli/util/testhelpers/io"
-	. "github.com/cloudfoundry/cli/util/testhelpers/matchers"
+	. "github.com/cloudfoundry/cli/cf/util/testhelpers/io"
+	. "github.com/cloudfoundry/cli/cf/util/testhelpers/matchers"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
