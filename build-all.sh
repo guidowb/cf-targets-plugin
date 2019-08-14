@@ -19,17 +19,17 @@ if [[ "$1" = "release" ]] ; then
 	fi
 fi
 
-GOOS=linux GOARCH=amd64 godep go build
+GOOS=linux GOARCH=amd64 go build
 LINUX64_SHA1=`cat cf-targets-plugin | openssl sha1`
 mkdir -p bin/linux64
 mv cf-targets-plugin bin/linux64
 
-GOOS=darwin GOARCH=amd64 godep go build
+GOOS=darwin GOARCH=amd64 go build
 OSX_SHA1=`cat cf-targets-plugin | openssl sha1`
 mkdir -p bin/osx
 mv cf-targets-plugin bin/osx
 
-GOOS=windows GOARCH=amd64 godep go build
+GOOS=windows GOARCH=amd64 go build
 WIN64_SHA1=`cat cf-targets-plugin.exe | openssl sha1`
 mkdir -p bin/win64
 mv cf-targets-plugin.exe bin/win64
@@ -42,7 +42,7 @@ sed "s/_TAG_/$TAG/" |
 cat
 
 #Final build gives developer a plugin to install
-godep go build
+go build
 
 if [[ "$1" = "release" ]] ; then
 	git commit -am "Build version $TAG"
