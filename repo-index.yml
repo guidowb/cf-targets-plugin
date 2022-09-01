@@ -10,9 +10,12 @@
     contact: gwestenberg@pivotal.io
   homepage: http://github.com/guidowb/cf-targets-plugin
   binaries:
-  - platform: osx
-    url: http://github.com/guidowb/cf-targets-plugin/raw/_TAG_/bin/osx/cf-targets-plugin
-    checksum: osx-sha1
+  - platform: osx-amd64
+    url: http://github.com/guidowb/cf-targets-plugin/raw/_TAG_/bin/osx-amd64/cf-targets-plugin
+    checksum: osx-amd64-sha1
+  - platform: osx-arm64
+    url: http://github.com/guidowb/cf-targets-plugin/raw/_TAG_/bin/osx-arm64/cf-targets-plugin
+    checksum: osx-arm64-sha1
   - platform: win64
     url: http://github.com/guidowb/cf-targets-plugin/raw/_TAG_/bin/win64/cf-targets-plugin.exe
     checksum: win64-sha1

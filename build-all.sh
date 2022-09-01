@@ -25,9 +25,14 @@ mkdir -p bin/linux64
 mv cf-targets-plugin bin/linux64
 
 GOOS=darwin GOARCH=amd64 go build
-OSX_SHA1=`cat cf-targets-plugin | openssl sha1`
-mkdir -p bin/osx
-mv cf-targets-plugin bin/osx
+OSX_AMD64_SHA1=`cat cf-targets-plugin | openssl sha1`
+mkdir -p bin/osx-amd64
+mv cf-targets-plugin bin/osx-amd64
+
+GOOS=darwin GOARCH=arm64 go build
+OSX_ARM64_SHA1=`cat cf-targets-plugin | openssl sha1`
+mkdir -p bin/osx-arm64
+mv cf-targets-plugin bin/osx-arm64/cf-targets-plugin
 
 GOOS=windows GOARCH=amd64 go build
 WIN64_SHA1=`cat cf-targets-plugin.exe | openssl sha1`
@@ -35,7 +40,8 @@ mkdir -p bin/win64
 mv cf-targets-plugin.exe bin/win64
 
 cat repo-index.yml |
-sed "s/osx-sha1/$OSX_SHA1/" |
+sed "s/osx-amd64-sha1/$OSX_AMD64_SHA1/" |
+sed "s/osx-arm64-sha1/$OSX_ARM64_SHA1/" |
 sed "s/win64-sha1/$WIN64_SHA1/" |
 sed "s/linux64-sha1/$LINUX64_SHA1/" |
 sed "s/_TAG_/$TAG/" |
