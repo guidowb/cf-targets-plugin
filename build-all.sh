@@ -42,7 +42,7 @@ mv cf-targets-plugin.exe bin/win64
 cat repo-index.yml |
 sed "s/osx-amd64-sha1/$OSX_AMD64_SHA1/" |
 sed "s/osx-arm64-sha1/$OSX_ARM64_SHA1/" |
-sed "s/win64-sha1/$WIN64_SHA1/" |
+# sed "s/win64-sha1/$WIN64_SHA1/" |
 sed "s/linux64-sha1/$LINUX64_SHA1/" |
 sed "s/_TAG_/$TAG/" |
 cat
