@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"testing"
@@ -9,5 +9,5 @@ import (
 
 func TestTargets(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Targets Suite")
+	RunSpecs(t, "CF Plugin Targets Suite")
 }
